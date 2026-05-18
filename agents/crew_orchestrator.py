@@ -94,6 +94,10 @@ def _run_crew_sync(goal, task_type):
     return result
 
 async def run_crew(goal, task_type="research", images=None):
+    # Explicit check for API Key
+    if not os.getenv("GROQ_API_KEY") or "xxxx" in os.getenv("GROQ_API_KEY", ""):
+        return "❌ CONFIGURATION ERROR: GROQ_API_KEY is missing or invalid in your Space Secrets. Please add your key from console.groq.com to the Hugging Face Settings tab."
+
     if images:
         try:
             desc = await complete(
@@ -104,6 +108,12 @@ async def run_crew(goal, task_type="research", images=None):
         except: pass
 
     try:
+        # Re-initialize LLM in case it was None at startup
+        global llm
+        if llm is None:
+            llm = _make_llm()
+            if llm is None: return "❌ LLM Initialization Failed. Check GROQ_API_KEY."
+
         result = await asyncio.wait_for(
             asyncio.to_thread(_run_crew_sync, goal, task_type),
             timeout=AGENT_TIMEOUT
