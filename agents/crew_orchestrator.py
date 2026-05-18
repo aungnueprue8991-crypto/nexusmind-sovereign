@@ -11,14 +11,11 @@ AGENT_TIMEOUT = int(os.getenv("AGENT_TIMEOUT_SECONDS","90"))
 def _make_llm():
     key = os.getenv("GROQ_API_KEY")
     if not key or "xxxx" in key:
-        print("⚠ WARNING: GROQ_API_KEY is missing. AI agents will fail to initialize.")
+        print("⚠ WARNING: GROQ_API_KEY is missing.")
         return None
-    return ChatOpenAI(
-        model="llama-3.3-70b-versatile",
-        api_key=key,
-        base_url="https://api.groq.com/openai/v1",
-        temperature=0.7, max_tokens=2000, request_timeout=60
-    )
+    # Use string format for CrewAI 0.80+ compatibility
+    return "groq/llama-3.3-70b-versatile"
+
 llm = _make_llm()
 
 @tool("Web Search")
