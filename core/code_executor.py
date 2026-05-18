@@ -17,7 +17,7 @@ def _clean_env():
     for k in ("PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONUNBUFFERED", "TERM"):
         if k in os.environ:
             safe[k] = os.environ[k]
-    safe["HOME"] = "/data/data/com.termux/files/home"
+    safe["HOME"] = os.getenv("HOME", "/tmp")
     return safe
 
 def validate_sandbox(code):
@@ -104,7 +104,7 @@ except Exception as e:
             text=True,
             timeout=EXECUTION_TIMEOUT,
             env=env,
-            cwd="/data/data/com.termux/files/home"
+            cwd=os.getcwd()
         )
         
         output = process.stdout

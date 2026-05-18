@@ -77,14 +77,11 @@ class MessagePayload(BaseModel):
 
 from security.rate_limiter import rate_limit
 
+from fastapi.responses import RedirectResponse
+
 @app.get("/")
 async def root():
-    from router.free_llm import remaining_budget
-    return {
-        "status": "NexusMind v2.3",
-        "budget": remaining_budget(),
-        "dashboard": "/dashboard",
-    }
+    return RedirectResponse(url="/dashboard/")
 
 @app.get("/health")
 async def health():
