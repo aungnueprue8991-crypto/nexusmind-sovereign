@@ -23,17 +23,20 @@ llm = _make_llm()
 
 @tool("Web Search")
 def web_search(query: str) -> str:
+    """Useful to search the internet for current events, news, and real-time information."""
     try: return DuckDuckGoSearchRun().run(query)
     except: return "Search failed"
 
 @tool("Memory Recall")
 def recall_memory(query: str) -> str:
+    """Retrieves relevant facts and skills from the agent's long-term persistent memory based on the query."""
     mem = hermes_memory.facts.search(query)
     sk = hermes_memory.skills.search(query)
     return "\n".join(mem+sk) or "No memories"
 
 @tool("Crypto Price")
 def get_crypto_price(coin: str) -> str:
+    """Fetches the current market price and 24h change for a specific cryptocurrency (e.g., 'bitcoin', 'ethereum')."""
     import httpx
     try:
         resp = httpx.get("https://api.coingecko.com/api/v3/simple/price",
@@ -43,6 +46,7 @@ def get_crypto_price(coin: str) -> str:
 
 @tool("Run Python Code")
 def run_python(code_and_mode: str) -> str:
+    """Executes Python code. Format: 'sandbox' or 'unlocked' on the first line, then the code. Default is sandbox."""
     lines = code_and_mode.split("\n",1)
     if len(lines)==2 and lines[0].strip() in ("sandbox","unlocked"):
         mode = lines[0].strip()
