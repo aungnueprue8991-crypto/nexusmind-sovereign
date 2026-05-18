@@ -101,67 +101,78 @@ async def health():
 
 @app.post("/run", dependencies=[Depends(rate_limit)])
 async def run_task(payload: TaskRequest):
-    if not payload.goal.strip():
-        raise HTTPException(400, "Goal empty")
-    from agents.crew_orchestrator import run_crew
-    from core.dreaming import mark_active
-    mark_active()
-    images = [a.data for a in payload.attachments if a.type == "image"]
-    text_parts = []
-    for a in payload.attachments:
-        if a.type != "image":
-            try:
-                import base64
-                if a.data.startswith("data:"):
-                    header, data = a.data.split(",", 1)
-                    decoded = base64.b64decode(data).decode("utf-8", errors="ignore")
-                    text_parts.append(f"[File: {a.name}]\n{decoded[:3000]}")
-                else:
-                    text_parts.append(f"[File: {a.name}]\n{a.data[:3000]}")
-            except: pass
-    goal = payload.goal
-    if text_parts:
-        goal += "\n\n" + "\n".join(text_parts)
-    result = await run_crew(goal, payload.task_type, images=images if images else None)
-    return {"goal": payload.goal, "result": result, "task_type": payload.task_type}
+    try:
+        if not payload.goal.strip():
+            raise HTTPException(400, "Goal empty")
+        from agents.crew_orchestrator import run_crew
+        from core.dreaming import mark_active
+        mark_active()
+        images = [a.data for a in payload.attachments if a.type == "image"]
+        text_parts = []
+        for a in payload.attachments:
+            if a.type != "image":
+                try:
+                    import base64
+                    if a.data.startswith("data:"):
+                        header, data = a.data.split(",", 1)
+                        decoded = base64.b64decode(data).decode("utf-8", errors="ignore")
+                        text_parts.append(f"[File: {a.name}]\n{decoded[:3000]}")
+                    else:
+                        text_parts.append(f"[File: {a.name}]\n{a.data[:3000]}")
+                except: pass
+        goal = payload.goal
+        if text_parts:
+            goal += "\n\n" + "\n".join(text_parts)
+        result = await run_crew(goal, payload.task_type, images=images if images else None)
+        return {"goal": payload.goal, "result": result, "task_type": payload.task_type}
+    except Exception as e:
+        import traceback
+        err_detail = traceback.format_exc()
+        print(f"CRITICAL ERROR in /run:\n{err_detail}")
+        return {"goal": payload.goal, "result": f"❌ INTERNAL ERROR: {str(e)}\nSee logs for details.", "task_type": payload.task_type}
 
 @app.post("/message", dependencies=[Depends(rate_limit)])
 async def handle_message(payload: MessagePayload):
-    from memory.hermes_memory import hermes_memory
-    from agents.crew_orchestrator import run_crew
-    from core.dreaming import mark_active
-    hermes_memory.session.add("user", payload.message)
-    mark_active()
-    images = [a.data for a in payload.attachments if a.type == "image"]
-    text_parts = []
-    for a in payload.attachments:
-        if a.type != "image":
-            try:
-                import base64
-                if a.data.startswith("data:"):
-                    header, data = a.data.split(",", 1)
-                    decoded = base64.b64decode(data).decode("utf-8", errors="ignore")
-                    text_parts.append(f"[File: {a.name}]\n{decoded[:3000]}")
-                else:
-                    text_parts.append(f"[File: {a.name}]\n{a.data[:3000]}")
-            except: pass
-    combined = payload.message
-    if text_parts:
-        combined += "\n\n" + "\n".join(text_parts)
-    t = combined.lower()
-    if any(w in t for w in ["code","write","fix","debug","script"]):
-        tt = "code"
-    elif any(w in t for w in ["bitcoin","crypto","eth","price","defi"]):
-        tt = "crypto"
-    elif any(w in t for w in ["analyze","trend","compare","data"]):
-        tt = "analysis"
-    elif any(w in t for w in ["why","reason","think","solve"]):
-        tt = "heavy"
-    else:
-        tt = "research"
-    result = await run_crew(combined, tt, images=images if images else None)
-    reply = result[:3800] + "…" if len(result) > 3800 else result
-    return {"reply": reply, "task_type": tt, "user_id": payload.user_id}
+    try:
+        from memory.hermes_memory import hermes_memory
+        from agents.crew_orchestrator import run_crew
+        from core.dreaming import mark_active
+        hermes_memory.session.add("user", payload.message)
+        mark_active()
+        images = [a.data for a in payload.attachments if a.type == "image"]
+        text_parts = []
+        for a in payload.attachments:
+            if a.type != "image":
+                try:
+                    import base64
+                    if a.data.startswith("data:"):
+                        header, data = a.data.split(",", 1)
+                        decoded = base64.b64decode(data).decode("utf-8", errors="ignore")
+                        text_parts.append(f"[File: {a.name}]\n{decoded[:3000]}")
+                    else:
+                        text_parts.append(f"[File: {a.name}]\n{a.data[:3000]}")
+                except: pass
+        combined = payload.message
+        if text_parts:
+            combined += "\n\n" + "\n".join(text_parts)
+        t = combined.lower()
+        if any(w in t for w in ["code","write","fix","debug","script"]):
+            tt = "code"
+        elif any(w in t for w in ["bitcoin","crypto","eth","price","defi"]):
+            tt = "crypto"
+        elif any(w in t for w in ["analyze","trend","compare","data"]):
+            tt = "analysis"
+        elif any(w in t for w in ["why","reason","think","solve"]):
+            tt = "heavy"
+        else:
+            tt = "research"
+        result = await run_crew(combined, tt, images=images if images else None)
+        reply = result[:3800] + "…" if len(result) > 3800 else result
+        return {"reply": reply, "task_type": tt, "user_id": payload.user_id}
+    except Exception as e:
+        import traceback
+        print(f"CRITICAL ERROR in /message:\n{traceback.format_exc()}")
+        return {"reply": f"⚠️ SYSTEM ERROR: {str(e)}. This usually means a dependency failed or the API key is rejected by Groq.", "task_type": "error", "user_id": payload.user_id}
 
 @app.post("/memory/recall")
 async def recall_memory(query: dict):
