@@ -89,7 +89,15 @@ async def root():
 @app.get("/health")
 async def health():
     from router.free_llm import remaining_budget
-    return {"status": "ok", "llm_budget_left": remaining_budget()}
+    return {
+        "status": "ok",
+        "llm_budget_left": remaining_budget(),
+        "diagnostics": {
+            "GROQ_KEY_DETECTED": bool(os.getenv("GROQ_API_KEY")),
+            "GEMINI_KEY_DETECTED": bool(os.getenv("GEMINI_API_KEY")),
+            "HMAC_SECRET_SET": os.getenv("INTERNAL_HMAC_SECRET") != "change-me"
+        }
+    }
 
 @app.post("/run", dependencies=[Depends(rate_limit)])
 async def run_task(payload: TaskRequest):
