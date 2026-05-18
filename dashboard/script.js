@@ -1,17 +1,3 @@
-const API = window.location.origin;
-console.log("NexusMind Dashboard linked to:", API);
-
-document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        const panelId = `panel-${btn.dataset.panel}`;
-        const target = document.getElementById(panelId);
-        if (target) target.classList.add('active');
-    });
-});
-
 const chatMessages = document.getElementById('chatMessages');
 const sendBtn = document.getElementById('sendBtn');
 const chatInput = document.getElementById('chatInput');
@@ -26,28 +12,36 @@ function addMessage(role, content) {
 
 sendBtn.addEventListener('click', async () => {
     const text = chatInput.value;
-    if (!text) return;
+    if (!text || sendBtn.disabled) return;
+    
     addMessage('user', text);
     chatInput.value = '';
     
+    // UI Loading state
+    sendBtn.disabled = true;
+    sendBtn.innerText = "Thinking...";
+    
     try {
-        const res = await fetch(`${API}/message`, {
+        // Use relative path for HF compatibility
+        const res = await fetch('../message', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({message: text})
         });
         
-        if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         
         const data = await res.json();
-        addMessage('assistant', data.reply || "I received your message but have no reply.");
+        addMessage('assistant', data.reply || "No response received.");
     } catch (err) {
-        console.error("Fetch failed:", err);
-        addMessage('assistant', `⚠️ Connection Error: ${err.message}. Check Hugging Face Logs.`);
+        console.error("Error:", err);
+        addMessage('assistant', `⚠️ System Error: ${err.message}. Please check if GROQ_API_KEY is set in Space Secrets.`);
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerText = "Send";
     }
 });
 
-// Auto-focus input
 chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendBtn.click();
 });
