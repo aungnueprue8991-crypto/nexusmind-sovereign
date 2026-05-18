@@ -1,6 +1,6 @@
 import os, asyncio
 from crewai import Agent, Task, Crew, Process
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain_community.tools import DuckDuckGoSearchRun
 from crewai.tools import tool
 from memory.hermes_memory import hermes_memory
@@ -13,8 +13,15 @@ def _make_llm():
     if not key or "xxxx" in key:
         print("⚠ WARNING: GROQ_API_KEY is missing.")
         return None
-    # Use string format for CrewAI 0.80+ compatibility
-    return "groq/llama-3.3-70b-versatile"
+    # Use native ChatGroq to avoid 'cache_breakpoint' errors
+    return ChatGroq(
+        model="llama-3.3-70b-versatile",
+        groq_api_key=key,
+        temperature=0.7,
+        max_tokens=None, # Allow model to decide
+        timeout=60,
+        max_retries=2
+    )
 
 llm = _make_llm()
 
@@ -125,6 +132,8 @@ async def run_crew(goal, task_type="research", images=None):
         hermes_memory.after_task(goal, msg, False, 0.1)
         return msg
     except Exception as e:
+        import traceback
+        print(f"DEBUG: {traceback.format_exc()}")
         msg = f"[ERROR] {str(e)[:200]}"
         hermes_memory.after_task(goal, msg, False, 0.0)
         return msg
