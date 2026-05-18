@@ -1,12 +1,17 @@
-const API = '';
+const API = window.location.origin;
+console.log("NexusMind Dashboard linked to:", API);
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(`panel-${btn.dataset.panel}`).classList.add('active');
+        const panelId = `panel-${btn.dataset.panel}`;
+        const target = document.getElementById(panelId);
+        if (target) target.classList.add('active');
     });
 });
+
 const chatMessages = document.getElementById('chatMessages');
 const sendBtn = document.getElementById('sendBtn');
 const chatInput = document.getElementById('chatInput');
@@ -24,7 +29,25 @@ sendBtn.addEventListener('click', async () => {
     if (!text) return;
     addMessage('user', text);
     chatInput.value = '';
-    const res = await fetch('/message', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
-    const data = await res.json();
-    addMessage('assistant', data.reply);
+    
+    try {
+        const res = await fetch(`${API}/message`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: text})
+        });
+        
+        if (!res.ok) throw new Error(`Server Error: ${res.status}`);
+        
+        const data = await res.json();
+        addMessage('assistant', data.reply || "I received your message but have no reply.");
+    } catch (err) {
+        console.error("Fetch failed:", err);
+        addMessage('assistant', `⚠️ Connection Error: ${err.message}. Check Hugging Face Logs.`);
+    }
+});
+
+// Auto-focus input
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendBtn.click();
 });
