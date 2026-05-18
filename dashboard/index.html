@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusMind Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo"><h1>🧠 NexusMind</h1></div>
+            <nav>
+                <button class="nav-btn active" data-panel="chat">💬 Chat</button>
+                <button class="nav-btn" data-panel="run">🚀 Run Task</button>
+                <button class="nav-btn" data-panel="memory">🧠 Memory</button>
+                <button class="nav-btn" data-panel="stats">📊 Stats</button>
+                <button class="nav-btn" data-panel="terminal">🖥️ Terminal</button>
+                <button class="nav-btn" data-panel="devices">📱 Devices</button>
+                <button class="nav-btn" data-panel="skills">🧩 Skills</button>
+                <button class="nav-btn" data-panel="dream-synth">🌙 Dream & Synth</button>
+                <button class="nav-btn" data-panel="addons">🧩 Add-ons</button>
+                <button class="nav-btn" data-panel="admin" id="adminNavBtn" style="display:none;">🔧 Admin</button>
+            </nav>
+            <div class="theme-toggle"><button id="themeBtn">🌓 Theme</button></div>
+        </aside>
+        <main class="main">
+            <section id="panel-chat" class="panel active">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message assistant"><div class="avatar">🧠</div><div class="bubble">Hello! I'm NexusMind.</div></div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type your message..." autofocus>
+                        <label for="fileInput" class="attach-btn" title="Attach files">📎</label>
+                        <input type="file" id="fileInput" multiple accept="image/*,text/*,.py,.txt,.md,.csv,.json,.pdf" style="display:none">
+                        <button id="sendBtn">Send</button>
+                    </div>
+                    <div id="previewStrip" class="preview-strip"></div>
+                </div>
+            </section>
+            <section id="panel-run" class="panel">
+                <h2>Run a structured task</h2>
+                <form id="runForm">
+                    <label>Goal</label>
+                    <textarea id="runGoal" rows="3" placeholder="e.g. Write a short story"></textarea>
+                    <label>Task type</label>
+                    <select id="runType">
+                        <option value="fast">Fast</option>
+                        <option value="research">Research</option>
+                        <option value="code">Code</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="analysis">Analysis</option>
+                        <option value="heavy">Heavy</option>
+                        <option value="full">Full crew</option>
+                        <option value="device">Device</option>
+                        <option value="automate">Automate</option>
+                    </select>
+                    <button type="submit">Run</button>
+                </form>
+                <div id="runResult" class="result-box" style="display:none;"></div>
+            </section>
+            <section id="panel-memory" class="panel">
+                <h2>Search memory</h2>
+                <form id="memoryForm"><input type="text" id="memoryQuery" placeholder="e.g. Python async"><button type="submit">Search</button></form>
+                <div id="memoryResults" class="result-box"></div>
+            </section>
+            <section id="panel-stats" class="panel">
+                <h2>System Statistics</h2>
+                <button id="refreshStats">Refresh</button>
+                <div id="statsContent"><p>Loading...</p></div>
+            </section>
+            <section id="panel-terminal" class="panel">
+                <h2>Python Terminal</h2>
+                <div class="terminal-wrapper">
+                    <div id="terminalOutput" class="terminal-output"></div>
+                    <div class="terminal-input-line">
+                        <span class="prompt">&gt;&gt;&gt;</span>
+                        <input type="text" id="terminalInput" placeholder="Enter Python code…" autocomplete="off">
+                        <button id="runTerminalBtn">Run</button>
+                    </div>
+                </div>
+            </section>
+            <section id="panel-devices" class="panel">
+                <h2>Connected Devices</h2>
+                <button id="refreshDevices">Refresh</button>
+                <div id="devicesList"><p>Loading...</p></div>
+                <div class="device-command">
+                    <h3>Send Command</h3>
+                    <select id="deviceSelect"><option>Select device...</option></select>
+                    <select id="commandType">
+                        <option value="shell">Shell Command</option>
+                        <option value="file_read">Read File</option>
+                        <option value="file_write">Write File</option>
+                        <option value="screenshot">Screenshot</option>
+                        <option value="notification">Notification</option>
+                    </select>
+                    <input type="text" id="commandInput" placeholder="Command...">
+                    <button id="sendDeviceCmd">Send</button>
+                    <div id="deviceResult" class="result-box" style="display:none;"></div>
+                </div>
+            </section>
+            <section id="panel-skills" class="panel">
+                <h2>Skill Library</h2>
+                <button id="refreshSkills">Refresh</button>
+                <div id="skillsList"></div>
+                <hr>
+                <h3>Create New Skill</h3>
+                <form id="skillForm">
+                    <label>Skill Name</label>
+                    <input type="text" id="skillName" placeholder="e.g. Web scraping">
+                    <label>Skill Content</label>
+                    <textarea id="skillContent" rows="6"></textarea>
+                    <button type="submit">Save Skill</button>
+                </form>
+            </section>
+            <section id="panel-dream-synth" class="panel">
+                <h2>🧠 Dream & Synthesize</h2>
+                <div class="action-group">
+                    <button id="dreamOnlyBtn">🌙 Dream Only</button>
+                    <button id="synthesizeOnlyBtn">🧠 Synthesize Only</button>
+                    <button id="combinedBtn" class="primary-btn">⚡ Combined</button>
+                </div>
+                <div id="dreamSynthResult" class="result-box" style="display:none;"></div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
