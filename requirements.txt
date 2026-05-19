@@ -10,7 +10,6 @@ litellm>=1.40.0
 crewai[tools]>=0.80.2
 langchain>=0.3.0
 langchain-community>=0.3.0
-langchain-openai>=0.2.0
 duckduckgo-search>=5.3.0
 supabase>=2.4.0
 aiofiles>=23.0.0
