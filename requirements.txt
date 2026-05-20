@@ -6,20 +6,23 @@ python-dotenv==1.0.1
 httpx==0.27.2
 tenacity>=8.4.1
 
-# langchain-openai 0.3.x stack requires higher openai version
-openai>=1.58.1
+# Lock Numpy to avoid the Numpy 2.0 conflict
+numpy>=1.22.5,<2.0.0
+
+# Stabilize LLM stack
+openai>=1.50.0,<1.60.0
 litellm==1.44.1
 
-# crewai 1.x branch requires chromadb ~1.1.0
+# crewai 1.x stack
 crewai>=1.0.0
 crewai-tools>=1.0.0
-chromadb==1.1.1
+chromadb>=0.5.3
 
-# langchain 0.3.x stack
-langchain==0.3.0
-langchain-community==0.3.0
-langchain-openai==0.3.0
-langchain-groq==0.3.0
+# langchain stack
+langchain>=0.2.0,<0.4.0
+langchain-community>=0.2.0,<0.4.0
+langchain-openai>=0.1.0,<0.4.0
+langchain-groq>=0.1.0,<0.4.0
 
 duckduckgo-search==6.2.10
 supabase==2.6.0
