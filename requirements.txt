@@ -1,38 +1,38 @@
-fastapi==0.111.0
-uvicorn==0.30.1
-pydantic>=2.8.2
-pydantic-settings>=2.4.0
-python-dotenv==1.0.1
-httpx==0.27.2
-tenacity>=8.4.1
+fastapi
+uvicorn
+pydantic>=2.0.0
+pydantic-settings
+python-dotenv
+httpx
+tenacity
 
-# Lock Numpy to avoid the Numpy 2.0 conflict
-numpy>=1.22.5,<2.0.0
+# CRITICAL: Hard-lock Numpy to avoid the 2.0 breaker
+numpy>=1.24.0,<2.0.0
 
-# Stabilize LLM stack
-openai>=1.50.0,<1.60.0
-litellm==1.44.1
+# Loosen LLM stack to allow resolver to find compatibility
+openai>=1.40.0
+litellm
 
-# crewai 1.x stack
-crewai>=1.0.0
-crewai-tools>=1.0.0
-chromadb>=0.5.3
+# CrewAI & ChromaDB (Loosened)
+crewai
+crewai-tools
+chromadb
 
-# langchain stack
-langchain>=0.2.0,<0.4.0
-langchain-community>=0.2.0,<0.4.0
-langchain-openai>=0.1.0,<0.4.0
-langchain-groq>=0.1.0,<0.4.0
+# LangChain 0.3.x stack (Loosened ranges)
+langchain
+langchain-community
+langchain-openai
+langchain-groq
 
-duckduckgo-search==6.2.10
-supabase==2.6.0
-aiofiles==24.1.0
-mem0ai>=0.1.20
-sqlalchemy==2.0.32
-tavily-python==0.3.5
-spacy==3.7.5
-networkx==3.3
-apscheduler==3.10.4
-pypdf==4.3.1
-beautifulsoup4==4.12.3
-prometheus-client==0.20.0
+duckduckgo-search
+supabase
+aiofiles
+mem0ai
+sqlalchemy
+tavily-python
+spacy
+networkx
+apscheduler
+pypdf
+beautifulsoup4
+prometheus-client
